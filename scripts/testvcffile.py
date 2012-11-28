@@ -1,6 +1,7 @@
 import unittest
 import vcffile
 import os
+import risksnps
 
 TESTDATADIR = '../data/'        
 SAMPLEFILENAME = TESTDATADIR + 'A0024_hg19.gatk.flt.vcf'
@@ -40,6 +41,23 @@ class TestVcfFile(unittest.TestCase):
         self.assertEqual('1', alleleNumber)
         alleleNumber = inputfile.get_an_allele_number('G', 'G')
         self.assertEqual('4', alleleNumber)
+
+    def test_get_these_snps(self):
+        '''
+        VcfFile.get_these_snps should return a list of allele numbers.
+        Note that they will usually be 4s because 4 represents the risk
+        allele and in this dataset, if a person has an allele that is different
+        from the reference genome, and it is for one of the risk snps,
+        it is usually, but not always the risk allele. 
+        '''
+        riskSnps = risksnps.RiskSnps()
+        riskSnps.set_snps(['rs102275', 'rs3764147', 'rs7927997', 'rs415890', 'rs4077515', 'rs3810936', 'rs2476601', 'rs3792109'])
+        riskSnps.set_alleles(['C','G','T','C','T','C','G','A'])
+        inputfile = vcffile.VcfFile(SAMPLEFILENAME)
+        alleleNumbers = inputfile.get_these_snps(riskSnps)
+        self.assertEqual(riskSnps.len(), len(alleleNumbers))
+        self.assertEqual('4', alleleNumbers[0])
+        self.assertEqual('4', alleleNumbers[1])
 
 def main():
     unittest.main()

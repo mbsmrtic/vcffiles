@@ -1,3 +1,6 @@
+DEFAULTDATADIR = '../data/'
+DEFAULTFILENAME = DEFAULTDATADIR + 'oddsratio.csv'
+
 class RiskSnps():
     '''
     RiskSnps is a collection of SNPs that have alleles that are associated
@@ -10,8 +13,13 @@ class RiskSnps():
     The sort order of the file is maintained. In the sample file used here,
     oddsRatio.csv I have the snps sorted in order of oddsRatio, low to high.
     '''
+
+
+    def __init__(self):
+        self.snps = []
+        self.alleles = []        
     
-    def read_from_file(self, sourceFileName):
+    def read_from_file(self, sourceFileName = DEFAULTFILENAME):
         '''
         Reads the snps from the file, maintaining the sort order in the file.
         '''

@@ -28,7 +28,6 @@ class VcfFile():
                 snpId = self.get_a_snp_id(a_line)
                 if (snpId):
                     return(a_line)
-            pass
         return("")
 
     def get_these_snps(self, riskSnps):
