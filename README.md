@@ -14,3 +14,9 @@ Crohn's disease dataset: https://genomeinterpretation.org/content/crohns-disease
 The format of the Crohn's disease dataset is Variant Call Format (vcf) files. A Variant Call Format file
 is a standard format for storing genomic data. It only stores the single nucleotide polymorphisms (SNP)
 that have alleles (A,C,G or T) that are different from a reference genome. 
+
+The SNPs that have been identified as having alleles with significant association with Crohn's disease
+are from Franke, A., & et.al. (2010, December). Genome-wide meta-analysis increases to 71 the number of 
+confirmed Crohn's disease susceptibility loci. Nature Genetics, 42(12), 1118-25.
+http://www.ncbi.nlm.nih.gov/pubmed/21102463 
+
