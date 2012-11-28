@@ -35,7 +35,7 @@ class VcfFile():
         Reads the file looking for the snps in the riskSnps argument.
         Returns an array of the allele numbers for the snps that were found.
         '''
-        alleles = ["#N/A"]*(riskSnps.len())
+        alleles = ['0']*(riskSnps.len())
         with open(self.filename, 'r') as snp_file:
             for a_line in snp_file:
                 snpId = self.get_a_snp_id(a_line)
@@ -84,15 +84,17 @@ class VcfFile():
         highest value (4), nas are still nas and everything else falls between those two.
         This emphasizes risk alleles in the visualization.  
         '''
+        alleleNumber = '0'
         riskAlleleDictionary = {'C': {'C':'4', 'G':'3', 'T':'2', 'A':'1'},
                                 'A': {'A':'4', 'G':'3', 'T':'2', 'C':'1'},
                                 'T': {'T':'4', 'G':'3', 'C':'2', 'A':'1'},
                                 'G': {'G':'4', 'T':'3', 'C':'2', 'A':'1'}}
+        personId = self.get_person_id()
         if (riskAllele in riskAlleleDictionary):
             alleleDictionary = riskAlleleDictionary[riskAllele]
             if (allele in alleleDictionary):
-                return alleleDictionary[allele]
-        return '0'
+                alleleNumber = alleleDictionary[allele]
+        return alleleNumber
         
         
     def get_an_allele(self, line):
