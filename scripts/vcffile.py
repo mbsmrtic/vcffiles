@@ -110,7 +110,6 @@ class VcfFile():
         '''
         Returns the person id from the filename.
         '''
-        #get the actual filename from the directory listing
         parts = self.filename.split('/')
         filename = parts[-1]   #the last one
         parts = filename.split('_')

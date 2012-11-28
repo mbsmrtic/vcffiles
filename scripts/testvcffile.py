@@ -2,13 +2,12 @@ import unittest
 import vcffile
 import os
 
-DATASETDIR = 'C:/Users/Mary Beth/Documents/Contests/Crohn_disease_andre_franke/data/'
 TESTDATADIR = '../data/'        
 SAMPLEFILENAME = TESTDATADIR + 'A0024_hg19.gatk.flt.vcf'
 
 class TestVcfFile(unittest.TestCase):
     '''
-    Tests for vcffile.
+    Tests for the VcfFile class.
     '''
 
     def test_person_id(self):
