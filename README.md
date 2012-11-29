@@ -10,6 +10,8 @@ website.
 Critical Assessment of Genome Interpretation website: https://genomeinterpretation.org/ 
 
 Crohn's disease dataset: https://genomeinterpretation.org/content/crohns-disease-2012 
+If you want to run the python scripts on this dataset, register at the above link
+and download the data into a folder called vcfdata under the existing vcffiles/data directory. 
 
 The format of the Crohn's disease dataset is Variant Call Format (vcf) files. A Variant Call Format file
 is a standard format for storing gene sequence variations. It only stores the single nucleotide polymorphisms (SNP)
