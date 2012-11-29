@@ -38,7 +38,7 @@ Output file formats
 			This class encapsulates a file format where there 3 columns: personId, snpId, and allele.
 			I use this table format to create a heatmap visualization where each dot is one of five
 			colors depending on whether the allele is A, C, G, or T. We want the highest contrast 
-			color to be the risk allele, so we convert the letters to numbers where 4 is the risk allele.  
+			color to be the risk allele, so VcfFile converts the letters to numbers where 4 is the risk allele.  
 	* RiskSnpTable
 			This class encapsulates a file format where there is one row per person and one column
 			per risk SNP. The output table is data/risksnptable.csv.  I use this table to create 
