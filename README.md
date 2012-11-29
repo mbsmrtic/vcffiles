@@ -1,4 +1,5 @@
 VcfFiles
+========
 
 The VcfFiles repository contains my first Python scripts.  My goal for this project 
 is to use it to learn Python. I chose to learn Python by getting a dataset and writing scripts 
@@ -26,25 +27,25 @@ Input file formats
 ------------------
 
 	* VcfFile 
-			** Variant Call Format is a file format for storing genetic data. It stores the differences from a
+			Variant Call Format is a file format for storing genetic data. It stores the differences from a
 			reference genome.  Our input data from the CAGI website is stored in this format. The class
 			VcfFile simply pulls the relevant snp alleles from the file to put into the desired output format.
 			There is one sample file included in this repository under data/vcffiles. The remaining files
 			can be downloaded from the CAGI website above.  
 	* RiskSnps
-			** I've included a table from the above paper that has a list of snps alleles with a significant 
+			I've included a table from the above paper that has a list of snps alleles with a significant 
 			association with Crohn's disease.  This file is included here in data/risksnps.csv
 			
 Output file formats
 -------------------
 
 	* RiskSnpTallTable
-			** This class encapsulates a file format where there 3 columns: personId, snpId, and allele.
+			This class encapsulates a file format where there 3 columns: personId, snpId, and allele.
 			I use this table format to create a heatmap visualization where each dot is one of five
 			colors depending on whether the allele is A, C, G, or T. We want the highest contrast 
 			color to be the risk allele, so VcfFile converts the letters to numbers where 4 is the risk allele.  
 	* RiskSnpTable
-			** This class encapsulates a file format where there is one row per person and one column
+			This class encapsulates a file format where there is one row per person and one column
 			per risk SNP. The output table is data/risksnptable.csv.  I use this table to create 
 			a parallel coordinates visualization where each line is a person and each axis is 
 			a risk SNP. 
