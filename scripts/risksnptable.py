@@ -80,7 +80,7 @@ class RiskSnpTable():
         columnCount = len(headerLine.split(','))
         snpsCount = columnCount - 1
         with open(self.filename, 'a') as destFile:
-            lineOut = '#N/A' + ',#N/A'*snpsCount + '\n'
+            lineOut = '0' + ',0'*snpsCount + '\n'
             destFile.write(lineOut)
 
             lineOut = '1' + ',1'*snpsCount + '\n'
