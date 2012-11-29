@@ -34,13 +34,19 @@ class RiskSnpTable():
         #open the destination file and write the header line
         headerLine = self.get_file_header()
         with open(self.filename, 'w') as destFile:
+            print "created " + self.filename + "\n"
             destFile.write(headerLine + "\n")
 
             #loop through the files in the directory and add a column for each
             srcFileNames = os.listdir(self.inputDir)
+            fileCount = 0
             for srcFileName in srcFileNames:
                 lineOut = self.get_one_person_from_file(self.inputDir + srcFileName)
                 destFile.write(lineOut)
+                fileCount += 1
+            if (fileCount == 1):
+                print ("You ran this on one snp file. For the entire dataset go to " +
+                        "https://genomeinterpretation.org/content/crohns-disease-2012 \n")
 
     def get_one_person_from_file(self, srcFileName):
         '''

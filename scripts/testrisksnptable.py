@@ -26,9 +26,9 @@ class TestRiskSnpTable(unittest.TestCase):
         self.assertEqual(6, len(splitLine))
         self.assertEqual("A0024", splitLine[0])#person id
         self.assertEqual('4', splitLine[1])    #rs7553640 risk allele C
-        self.assertEqual('#N/A', splitLine[2]) #rsnotinfile
+        self.assertEqual('0', splitLine[2]) #rsnotinfile
         self.assertEqual('4', splitLine[3])    #rs2072928 risk allele G
-        self.assertEqual('#N/A', splitLine[4]) #rsalsonotthere
+        self.assertEqual('0', splitLine[4]) #rsalsonotthere
         self.assertEqual('4', splitLine[5])    #rs28640257 risk allele G
 
     def test_get_file_header(self):
