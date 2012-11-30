@@ -25,10 +25,10 @@ class RiskSnps():
         '''
         self.snps = []
         self.alleles = []
-        with open(sourceFileName) as file:
+        with open(sourceFileName) as srcfile:
             #the first line is the header line
             firstLine = True
-            for a_line in file:
+            for a_line in srcfile:
                 if (firstLine):
                     firstLine = False
                 else:
