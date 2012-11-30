@@ -3,12 +3,12 @@ import vcffile
 import risksnps
 
 DEFAULT_DATA_DIR = '../data/'
-DEFAULT_OUTPUT_FILE_NAME = DEFAULT_DATA_DIR + 'risksnptalltable.csv'
+DEFAULT_OUTPUT_FILE_NAME = DEFAULT_DATA_DIR + 'talltable.csv'
 DEFAULT_VCFS_DIR = DEFAULT_DATA_DIR + 'vcfdata/'
 
-class RiskSnpTallTable():
+class TallTable():
     '''
-    RiskSnpTallTable is a table we'll create from the vcf files. It contains
+    TallTable is a table we'll create from the vcf files. It contains
     column of personids, one column of risksnpids and one column of allele values.
 
     A risk snp is a Single Nucleotide Polymorphism (snp) that has an allele
@@ -18,11 +18,9 @@ class RiskSnpTallTable():
     directory adding a person at a time.
     
     '''
-    #todo Decide on a consistent naming convention for variables: camel caps or underscores?
-
+    
     def __init__(self, inputDirectoryName = DEFAULT_VCFS_DIR, outputFileName=DEFAULT_OUTPUT_FILE_NAME):
         self.filename = outputFileName
-        self.riskSnps = risksnps.RiskSnps()
         self.inputDir = inputDirectoryName
 
     def add_all(self):
@@ -30,8 +28,8 @@ class RiskSnpTallTable():
         Loops through all the files in inputDir directory, adding a column of personIds,
         a column of risk snpIds and a column of alleles
         '''
-        self.riskSnps.read_from_file()
         
+        os.remove(self.filename)
         #open the destination file and write the header line
         with open(self.filename, 'w') as destFile:
             print "created " + self.filename + "\n"
@@ -52,20 +50,57 @@ class RiskSnpTallTable():
         '''
         Gets the alleles for the risk snps from srcFile
         '''
-        print srcFileName
+
+        srcData = vcffile.VcfFile(srcFileName)
+        personId = srcData.get_person_id()
+        snpsAndAlleles = srcData.get_all_snps_and_alleles()
+        recordCount = 0
+        for snpAndAllele in snpsAndAlleles:
+            if (snpAndAllele[1] != '0'):
+                lineOut = personId + ',' + snpAndAllele[0] + ',' + snpAndAllele[1] + '\n'
+                destFile.write(lineOut)
+            recordCount += 1
+        print srcFileName + ' wrote ' + str(recordCount) + ' records to ' + self.filename
+
+class RiskSnpTallTable(TallTable):
+    '''
+    RiskSnpTallTable is the same format as TallTable, but instead of including all the snps
+    from all the vcf files, we include only the snps that in riskSnps.  This will result
+    in a table with fewer rows.  
+    '''
+
+    def __init__(self, inputDirectoryName = DEFAULT_VCFS_DIR, outputFileName=DEFAULT_OUTPUT_FILE_NAME):
+        TallTable.__init__(self, inputDirectoryName, outputFileName)
+        self.riskSnps = risksnps.RiskSnps()
+
+
+    def write_one_person_to_file(self, srcFileName, destFile):
+        '''
+        Gets the alleles for the risk snps from srcFile
+        '''
+
+        if (self.riskSnps.len() == 0):
+            self.riskSnps.read_from_file()
+        
         srcData = vcffile.VcfFile(srcFileName)
         personId = srcData.get_person_id()
         riskAlleles = srcData.get_these_snps(self.riskSnps)
         index = 0
+        recordCount = 0;
         for allele in riskAlleles:
             if (allele != '0'):
                 lineOut = personId + ',' + self.riskSnps.snps[index] + ',' + allele + '\n'
                 destFile.write(lineOut)
+                recordCount += 1
             index += 1
+        print srcFileName + ' wrote ' + str(recordCount) + ' records to ' + self.filename
 
 if __name__ == '__main__':
-    destObj = RiskSnpTallTable()
+    destObj = TallTable()
     destObj.add_all()
+    destObj = RiskSnpTallTable(outputFileName='../data/risksnptalltable.csv')
+    destObj.add_all()
+    
     
         
         
