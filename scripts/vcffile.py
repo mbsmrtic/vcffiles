@@ -33,7 +33,7 @@ class VcfFile():
     def get_these_snps(self, riskSnps):
         '''
         Reads the file looking for the snps in the riskSnps argument.
-        Returns an array of the allele numbers for the snps that were found.
+        Returns a list of the allele numbers for the snps that were found.
         '''
         alleles = ['0']*(riskSnps.len())
         with open(self.filename, 'r') as snp_file:
