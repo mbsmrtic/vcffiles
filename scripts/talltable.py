@@ -8,13 +8,10 @@ DEFAULT_VCFS_DIR = DEFAULT_DATA_DIR + 'vcfdata/'
 
 class TallTable():
     '''
-    TallTable is a table we'll create from the vcf files. It contains
+    TallTable is a table we'll create from the vcf files. It contains one
     column of personids, one column of risksnpids and one column of allele values.
 
-    A risk snp is a Single Nucleotide Polymorphism (snp) that has an allele
-    with a significant association with the disease.
-
-    The data for each person is stored in a vcf file, so we loop through the
+    The data for each person is stored in a vcf file, so we loop through the vcf 
     directory adding a person at a time.
     
     '''
@@ -26,7 +23,7 @@ class TallTable():
     def add_all(self):
         '''
         Loops through all the files in inputDir directory, adding a column of personIds,
-        a column of risk snpIds and a column of alleles
+        a column of snpIds and a column of alleles
         '''
         
         os.remove(self.filename)
@@ -48,7 +45,7 @@ class TallTable():
 
     def write_one_person_to_file(self, srcFileName, destFile):
         '''
-        Gets the alleles for the risk snps from srcFile
+        Gets the alleles for the snps from srcFile and writes them to the output file
         '''
 
         srcData = vcffile.VcfFile(srcFileName)
@@ -67,6 +64,11 @@ class RiskSnpTallTable(TallTable):
     RiskSnpTallTable is the same format as TallTable, but instead of including all the snps
     from all the vcf files, we include only the snps that in riskSnps.  This will result
     in a table with fewer rows.  
+
+    A risk snp is a Single Nucleotide Polymorphism (snp) that has an allele
+    with a significant association with the disease.
+
+
     '''
 
     def __init__(self, inputDirectoryName = DEFAULT_VCFS_DIR, outputFileName=DEFAULT_OUTPUT_FILE_NAME):
@@ -76,7 +78,7 @@ class RiskSnpTallTable(TallTable):
 
     def write_one_person_to_file(self, srcFileName, destFile):
         '''
-        Gets the alleles for the risk snps from srcFile
+        Gets the alleles for the risk snps from srcFile and writes them to the output file
         '''
 
         if (self.riskSnps.len() == 0):
