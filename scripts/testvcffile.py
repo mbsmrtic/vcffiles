@@ -59,6 +59,11 @@ class TestVcfFile(unittest.TestCase):
         self.assertEqual('4', alleleNumbers[0])
         self.assertEqual('4', alleleNumbers[1])
 
+    def test_get_persons_file_name(self):
+        '''VcfFile.get_persons_file_name should return a valid file name of the file that contains
+        that person's data '''
+        
+        
 def main():
     unittest.main()
 
