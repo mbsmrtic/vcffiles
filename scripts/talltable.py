@@ -20,14 +20,16 @@ class TallTable():
         self.filename = outputFileName
         self.inputDir = inputDirectoryName
 
+        
     def add_all(self):
         '''
         Loops through all the files in inputDir directory, adding a column of personIds,
         a column of snpIds and a column of alleles
         '''
-        
-        os.remove(self.filename)
+                    
         #open the destination file and write the header line
+        if (os.path.exists(self.filename)):
+            os.remove(self.filename)
         with open(self.filename, 'w') as destFile:
             print "created " + self.filename + "\n"
             headerLine = "personid, snpid, allele"
