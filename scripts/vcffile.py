@@ -107,6 +107,13 @@ class VcfFile():
         allele = split[4]
         return allele;
 
+    def get_persons_file_name(self, personId):
+        '''
+        Returns the name of the file that contains this person's data.
+        '''
+        filename = personId + '_hg19.gatk.flt.vcf'
+        return filename
+        
     def get_person_id(self):
         '''
         Returns the person id from the filename.
