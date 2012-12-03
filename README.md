@@ -39,6 +39,14 @@ Input file formats
 Current output file formats
 ---------------------------------
 
+	* TallTable
+			This class encapsulates a file format with at least these columns: personId, snpId, allele
+	* TallSomePpl
+			A tall table that can be filled with specific people. This is needed because when we include
+			all the people, the file is too large to pull into Tableau.
+	* SnpsInCommon
+			This class creates a difference matrix. Each row of the table is a person and each column is 
+			a person. Each cell contains the count of snps for which the two people have different alleles.
 	* RiskSnpTallTable
 			This class encapsulates a file format with 3 columns: personId, snpId, and alleleNumber.
 			I use this table format to create a heatmap visualization where each dot is one of five
