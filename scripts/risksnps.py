@@ -25,6 +25,7 @@ class RiskSnps():
         '''
         self.snps = []
         self.alleles = []
+        self.oddsratio = []
         with open(sourceFileName) as srcfile:
             #the first line is the header line
             firstLine = True
@@ -38,6 +39,7 @@ class RiskSnps():
                     fields = a_line.split(',')
                     self.snps.append(fields[0])
                     self.alleles.append(fields[3])
+                    self.oddsratio.append(fields[2])
 
     def len(self):
         '''The count of snps in the collection.'''
