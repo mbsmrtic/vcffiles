@@ -12,6 +12,10 @@ class TestRiskSnps(unittest.TestCase):
     Tests for the RiskSnps class.
     '''
 
+    def setUp(self):
+        unittest.TestCase.setUp(self)
+        print self.__class__.__name__ 
+
     def test_read_from_file(self):
         '''
         RiskSnps.read_from_file should fill in the snps with the expected risk snps.
