@@ -11,6 +11,10 @@ class TestRiskSnpTable(unittest.TestCase):
     one row per person and one column per risk snp.
     '''
 
+    def setUp(self):
+        unittest.TestCase.setUp(self)
+        print self.__class__.__name__ 
+
     def test_get_one_person(self):
         '''
         RiskSnpTable.get_one_person_row should return a comma separated line that

@@ -11,6 +11,11 @@ class TestVcfFile(unittest.TestCase):
     Tests for the VcfFile class.
     '''
 
+    def setUp(self):
+        unittest.TestCase.setUp(self)
+        print self.__class__.__name__ 
+
+
     def test_person_id(self):
         '''VcfFile.get_person_id should pull the person id from the file name'''
         self.assertTrue(os.path.exists(SAMPLEFILENAME))
