@@ -32,8 +32,7 @@ class TallTable():
             os.remove(self.filename)
         with open(self.filename, 'w') as destFile:
             print "created " + self.filename + "\n"
-            headerLine = "personid, snpid, allele"
-            destFile.write(headerLine + "\n")
+            self.write_header_line(destFile)
 
             #loop through the files in the directory and add a column for each
             srcFileNames = os.listdir(self.inputDir)
@@ -45,6 +44,11 @@ class TallTable():
                 print ("You ran this on one snp file, for the entire dataset go to " +
                         "https://genomeinterpretation.org/content/crohns-disease-2012 \n")
 
+    def write_header_line(self, destFile):
+            headerLine = "personid, snpid, allele"
+            destFile.write(headerLine + "\n")
+      
+        
     def write_one_person_to_file(self, srcFileName, destFile):
         '''
         Gets the alleles for the snps from srcFile and writes them to the output file
@@ -77,6 +81,9 @@ class RiskSnpTallTable(TallTable):
         TallTable.__init__(self, inputDirectoryName, outputFileName)
         self.riskSnps = risksnps.RiskSnps()
 
+    def write_header_line(self, destFile):
+            headerLine = "personid, snpid, allele, oddsratio"
+            destFile.write(headerLine + "\n")
 
     def write_one_person_to_file(self, srcFileName, destFile):
         '''
@@ -93,15 +100,15 @@ class RiskSnpTallTable(TallTable):
         recordCount = 0;
         for allele in riskAlleles:
             if (allele != '0'):
-                lineOut = personId + ',' + self.riskSnps.snps[index] + ',' + allele + '\n'
+                lineOut = personId + ',' + self.riskSnps.snps[index] + ',' + allele + ',' + self.riskSnps.oddsratio[index] +'\n'
                 destFile.write(lineOut)
                 recordCount += 1
             index += 1
         print srcFileName + ' wrote ' + str(recordCount) + ' records to ' + self.filename
 
 if __name__ == '__main__':
-    destObj = TallTable()
-    destObj.add_all()
+    #destObj = TallTable()
+    #destObj.add_all()
     destObj = RiskSnpTallTable(outputFileName='../data/risksnptalltable.csv')
     destObj.add_all()
     
