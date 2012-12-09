@@ -82,8 +82,9 @@ class RiskSnpTallTable(TallTable):
         self.riskSnps = risksnps.RiskSnps()
 
     def write_header_line(self, destFile):
-            headerLine = "personid, snpid, allele, oddsratio"
+            headerLine = "index,personid,snpid,allele,oddsratio"
             destFile.write(headerLine + "\n")
+            self._recordCount = 0
 
     def write_one_person_to_file(self, srcFileName, destFile):
         '''
@@ -97,14 +98,15 @@ class RiskSnpTallTable(TallTable):
         personId = srcData.get_person_id()
         riskAlleles = srcData.get_these_snps(self.riskSnps)
         index = 0
-        recordCount = 0;
+        riskSnpsThisPerson = 0
         for allele in riskAlleles:
             if (allele != '0'):
-                lineOut = personId + ',' + self.riskSnps.snps[index] + ',' + allele + ',' + self.riskSnps.oddsratio[index] +'\n'
+                lineOut = str(self._recordCount) + ',' + personId + ',' + self.riskSnps.snps[index] + ',' + allele + ',' + self.riskSnps.oddsratio[index] +'\n'
                 destFile.write(lineOut)
-                recordCount += 1
+                self._recordCount += 1
+                riskSnpsThisPerson += 1
             index += 1
-        print srcFileName + ' wrote ' + str(recordCount) + ' records to ' + self.filename
+        print srcFileName + '  ' + str(riskSnpsThisPerson) + ' risk snps'
 
 if __name__ == '__main__':
     #destObj = TallTable()
