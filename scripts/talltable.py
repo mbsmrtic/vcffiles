@@ -1,10 +1,12 @@
 import os
 import vcffile
 import risksnps
+import snpcounts
 
 DEFAULT_DATA_DIR = '../data/'
 DEFAULT_OUTPUT_FILE_NAME = DEFAULT_DATA_DIR + 'talltable.csv'
 DEFAULT_VCFS_DIR = DEFAULT_DATA_DIR + 'vcfdata/'
+DEFAULT_SNPS_FILE = DEFAULT_DATA_DIR + 'snpcounts.csv'
 
 class TallTable():
     '''
@@ -65,6 +67,43 @@ class TallTable():
             recordCount += 1
         print srcFileName + ' wrote ' + str(recordCount) + ' records to ' + self.filename
 
+class SomeSnpsTallTable(TallTable):
+    '''
+    SomeSnpsTallTable is the same format as TallTable, but only includes some of the snps.
+    The snps to include
+    '''
+    
+    def __init__(self, snpsFileName = DEFAULT_SNPS_FILE,inputDirectoryName = DEFAULT_VCFS_DIR, outputFileName=DEFAULT_OUTPUT_FILE_NAME):
+        TallTable.__init__(self, inputDirectoryName, outputFileName)
+        self.snpsFileName = snpsFileName
+    
+    def write_header_line(self, destFile):
+        destFile.write('index,personId,snpid,allele\n')
+        self._recordCount = 0
+        
+    def write_one_person_to_file(self, srcFileName, destFile):
+        #get the snps
+        snpsToUse = self.get_snps_to_use()
+
+        srcData = vcffile.VcfFile(srcFileName)
+        personId = srcData.get_person_id()
+        alleles = srcData.get_these_snps(snpsToUse)
+        index = 0
+        snpsFoundThisPerson = 0
+        for allele in alleles:
+            if (allele != '0'):
+                lineOut = str(self._recordCount) + ',' + personId + ',' + snpsToUse[index] + ',' + allele + '\n'
+                destFile.write(lineOut)
+                self._recordCount += 1
+                snpsFoundThisPerson += 1
+            index += 1
+        print srcFileName + '  ' + str(snpsFoundThisPerson) + ' snps found'
+     
+    def get_snps_to_use(self):   
+        snpCounts = snpcounts.SnpCounts()
+        return snpCounts.read_snps()
+                    
+        
 class RiskSnpTallTable(TallTable):
     '''
     RiskSnpTallTable is the same format as TallTable, but instead of including all the snps
@@ -96,7 +135,7 @@ class RiskSnpTallTable(TallTable):
         
         srcData = vcffile.VcfFile(srcFileName)
         personId = srcData.get_person_id()
-        riskAlleles = srcData.get_these_snps(self.riskSnps)
+        riskAlleles = srcData.get_these_risksnps(self.riskSnps)
         index = 0
         riskSnpsThisPerson = 0
         for allele in riskAlleles:
@@ -111,7 +150,9 @@ class RiskSnpTallTable(TallTable):
 if __name__ == '__main__':
     #destObj = TallTable()
     #destObj.add_all()
-    destObj = RiskSnpTallTable(outputFileName='../data/risksnptalltable.csv')
+    #destObj = RiskSnpTallTable(outputFileName='../data/risksnptalltable.csv')
+    #destObj.add_all()
+    destObj = SomeSnpsTallTable(outputFileName='../data/somesnpstall.csv')
     destObj.add_all()
     
     
