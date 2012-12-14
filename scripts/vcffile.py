@@ -1,3 +1,5 @@
+import risksnps
+
 class VcfFile():
     '''Variant Call Format files.
 
@@ -11,7 +13,6 @@ class VcfFile():
     and analysis of the genomic data provided.  
     '''
 
-    import risksnps
 
     def __init__(self,filename = ""):
         self.filename = filename
@@ -30,7 +31,7 @@ class VcfFile():
                     return(a_line)
         return("")
 
-    def get_these_snps(self, riskSnps):
+    def get_these_risksnps(self, riskSnps):
         '''
         Reads the file looking for the snps in the riskSnps argument.
         Returns a list of the allele numbers for the snps that were found.
@@ -47,6 +48,21 @@ class VcfFile():
                     alleles[index] = alleleNumber
         return alleles
 
+    def get_these_snps(self, snpsToUse):
+        '''
+        Reads the file looking for the snps in the snpsToUse argument.
+        Returns a list of the alleles for the snps that were found.
+        '''
+        alleles = ['0']*(len(snpsToUse))
+        with open(self.filename, 'r') as snp_file:
+            for a_line in snp_file:
+                snpId = self.get_a_snp_id(a_line)
+                if (snpId in snpsToUse):
+                    index = snpsToUse.index(snpId)
+                    sourceAllele = self.get_an_allele(a_line)
+                    alleles[index] = sourceAllele
+        return alleles
+
     def get_all_snps_and_alleles(self):
         '''
         Reads the file and returns a list containing all the snp, allele combinations.
@@ -61,7 +77,23 @@ class VcfFile():
                     alldata.append([snpId, sourceAllele])
                     index += 1
         return alldata
-                    
+        
+    def get_all_snps_and_locations(self):
+        '''
+        '''
+        alldata = []
+        index = 0
+        with open(self.filename, 'r') as snp_file:
+            for a_line in snp_file:
+                snpId = self.get_a_snp_id(a_line)
+                if (len(snpId) > 0):
+                    chrom = self.get_a_chrom(a_line)
+                    location = self.get_a_location(a_line)
+                    sourceAllele = self.get_an_allele(a_line)
+                    alldata.append([snpId, sourceAllele, chrom, location])
+                    index += 1
+        return alldata
+        
     def get_a_snp_id(self, line):
         '''
         Looks for a snp id, a string starting with rs. If one is found, it's
@@ -101,11 +133,27 @@ class VcfFile():
         '''
         Returns the allele from this line.  
         '''
-        split = line.split();
+        split = line.split()
         if (split.__len__() < 5):
             return('')
         allele = split[4]
         return allele;
+
+    def get_a_chrom(self,line):
+        '''
+        Returns the chromosome from this line.
+        '''
+        split = line.split()
+        chrom = split[0]
+        if chrom.find('chr') == 0:
+            return chrom
+        else:
+            return ''
+        
+    def get_a_location(self,line):
+        split = line.split()
+        location = split[1]
+        return location
 
     def get_persons_file_name(self, personId):
         '''
