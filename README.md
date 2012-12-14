@@ -58,4 +58,8 @@ Current output file formats
 			per risk SNP. The output table is data/risksnptable.csv.  I use this table to create 
 			a parallel coordinates visualization where each line is a person and each axis is 
 			a risk SNP. 
+	* SomeSnpsTable
+			This class encapsulates a file format with one row per snp and one column per person.  
+			Each cell contains the allele.  We'll use this to create a parallel coordinates view of 
+			the snps.
                                                 
