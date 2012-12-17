@@ -1,5 +1,10 @@
+import csv
+
 DEFAULTDATADIR = '../data/'
 DEFAULTFILENAME = DEFAULTDATADIR + 'oddsratio.csv'
+FIELD_SNP_ID = 'dbSNP ID'
+FIELD_ODDS_RATIO = 'OddsRatio'
+FIELD_ALLELE = 'Risk Allele'
 
 class RiskSnps():
     '''
@@ -26,20 +31,18 @@ class RiskSnps():
         self.snps = []
         self.alleles = []
         self.oddsratio = []
-        with open(sourceFileName) as srcfile:
-            #the first line is the header line
-            firstLine = True
-            for a_line in srcfile:
-                if (firstLine):
-                    firstLine = False
-                else:
-                    #remove newline character
-                    if (a_line[-1] == "\n"):
-                        a_line = a_line[0:-1]
-                    fields = a_line.split(',')
-                    self.snps.append(fields[0])
-                    self.alleles.append(fields[3])
-                    self.oddsratio.append(fields[2])
+        #count the number of records we read
+        countOfRecordsRead = 0
+        with open(sourceFileName, 'r') as srcfile:
+            reader = csv.DictReader(srcfile)
+            
+            for row in reader:
+                self.snps.append(row[FIELD_SNP_ID])
+                self.alleles.append(row[FIELD_ALLELE])
+                self.oddsratio.append(row[FIELD_ODDS_RATIO])
+                countOfRecordsRead += 1
+            
+        print "read " + str(countOfRecordsRead) + " records from " + sourceFileName
 
     def len(self):
         '''The count of snps in the collection.'''
