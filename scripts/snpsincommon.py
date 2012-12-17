@@ -1,11 +1,13 @@
 import os
 import vcffile 
+import csv
 
 DEFAULT_DATA_DIR = '../data/'
 DEFAULT_OUTPUT_FILE_NAME = DEFAULT_DATA_DIR + 'diffcounts.csv'
 DEFAULT_VCFS_DIR = DEFAULT_DATA_DIR + 'vcfdata/'
 MAXSNPID ='zz'    #snpIDs begin with an 'rs' so they will always be less than this 
 MINSNPID = 'aa'
+FIELD_PERSONID = 'personId'
 
 class SnpsInCommon():
     '''
@@ -28,23 +30,23 @@ class SnpsInCommon():
         of a measure of difference.  
         '''
         
-        #create header line
-        lineOut = 'personId'
+        headerFields = [FIELD_PERSONID]
+        
         srcFileNames = os.listdir(self.inputDirectory)
         for srcFileName in srcFileNames:
             srcFile = vcffile.VcfFile(srcFileName)
             personId = srcFile.get_person_id()
-            lineOut += ',' + personId
-        lineOut += '\n'
+            headerFields.append(personId)
         
         with open(self.filename, 'w') as destFile:
-            destFile.write(lineOut)
-            
+            writer = csv.DictWriter(destFile, fieldnames=headerFields, lineterminator='\n')
+            writer.writeheader()
+            countOfSrcFiles = 0
             for srcFileName in srcFileNames:
                 print srcFileName
                 srcFile = vcffile.VcfFile(self.inputDirectory + srcFileName)
                 personId = srcFile.get_person_id()
-                lineOut = personId
+                rowOut = {FIELD_PERSONID:personId}
                 snpsAndAlleles = srcFile.get_all_snps_and_alleles()
                 snpsAndAlleles = sorted(snpsAndAlleles)
                 for compareFileName in srcFileNames:
@@ -57,9 +59,10 @@ class SnpsInCommon():
                         compareSnpsAndAlleles = compareFile.get_all_snps_and_alleles()
                         compareSnpsAndAlleles = sorted(compareSnpsAndAlleles)
                         countDiffs = self.count_diffs(snpsAndAlleles, compareSnpsAndAlleles)
-                    lineOut += ',' + str(countDiffs)
-                lineOut += '\n'
-                destFile.write(lineOut)
+                    rowOut[comparePerson] = countDiffs
+                writer.writerow(rowOut)
+                countOfSrcFiles += 1
+        print "Wrote " + str(countOfSrcFiles) + " to " + self.filename
                     
     
     def count_diffs(self, snpsAndAlleles, compareSnpsAndAlleles):
