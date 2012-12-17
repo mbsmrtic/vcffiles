@@ -20,7 +20,7 @@ class CorrelationMatrix():
     field1Name, field2Name and correlation value.  This format is useful for some visualizations 
     such as heatmap.
     
-    @todo: allow column name args (for now we're using colA and colB and cor as our column names)
+    @todo: allow column name args (for now we're using A and B and value as our column names)
     '''
     
     def __init__(self, inputFileName=DEFAULT_INPUT_FILE_NAME, outputFileName=DEFAULT_OUTPUT_FILE_NAME):
@@ -37,32 +37,28 @@ class CorrelationMatrix():
         
         #open input file
         with open(self._input_file_name, 'r') as inputFile:
+            reader = csv.DictReader(inputFile)
             with open(self._output_file_name, 'w') as outputFile:
-                lineOut = "A,B,value\n"
-                outputFile.write(lineOut)
-                
-                #get fields from header line
-                lineIn = inputFile.readline()
-                lineIn = lineIn[:-1]    #remove carriage return
-                print lineIn
-                colBNames = lineIn.split(',')
-                #remove first one field
-                colBNames = colBNames[1:]
+                writer = csv.DictWriter(outputFile, fieldnames = ['A', 'B', 'value'], lineterminator='\n')
+                writer.writeheader()
                     
-                for lineIn in inputFile:
-                    lineIn = lineIn[:-1]  #remove carriage return
-                    print lineIn
-                    lineOut = ''
-                    corValues = lineIn.split(',')
-                    colAName = corValues[0]
-                    corValues = corValues[1:]
+                #count the number of rows we write
+                countOfRowsWritten = 0
+                #loop through the rows in the input file
+                for rowIn in reader:
+                    #read the field name and then remove it from the row
+                    colAName = rowIn['Field']
+                    del rowIn['Field']
                     
-                    colBIndex = 0
-                    for value in corValues:
-                        lineOut = colAName + ',' + colBNames[colBIndex] + ',' + value + '\n'
-                        colBIndex += 1
-                        outputFile.write(lineOut)
-                print '.'
+                    rowOut = {'A':0, 'B':0, 'value':0}
+                    for field in rowIn:
+                        value = rowIn[field]
+                        rowOut['A'] = colAName
+                        rowOut['B'] = field
+                        rowOut['value'] = value
+                        writer.writerow(rowOut)
+                        countOfRowsWritten += 1
+        print "wrote " + str(countOfRowsWritten) + " rows to " + self._output_file_name
             
         
 if __name__ == '__main__':
