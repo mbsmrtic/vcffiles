@@ -4,6 +4,9 @@ import csv
 DEFAULT_DATA_DIR = '../data/'
 DEFAULT_INPUT_FILE_NAME = DEFAULT_DATA_DIR + 'dietmortcor.csv'
 DEFAULT_OUTPUT_FILE_NAME = DEFAULT_DATA_DIR + 'dietmortflat.csv'
+FIELD_A_NAME = 'A'
+FIELD_B_NAME = 'B'
+FIELD_VALUE_NAME = 'value'
 
 
 class CorrelationMatrix():
@@ -39,7 +42,8 @@ class CorrelationMatrix():
         with open(self._input_file_name, 'r') as inputFile:
             reader = csv.DictReader(inputFile)
             with open(self._output_file_name, 'w') as outputFile:
-                writer = csv.DictWriter(outputFile, fieldnames = ['A', 'B', 'value'], lineterminator='\n')
+                colnames = [FIELD_A_NAME, FIELD_B_NAME, FIELD_VALUE_NAME]
+                writer = csv.DictWriter(outputFile, fieldnames = colnames, lineterminator='\n')
                 writer.writeheader()
                     
                 #count the number of rows we write
@@ -50,12 +54,12 @@ class CorrelationMatrix():
                     colAName = rowIn['Field']
                     del rowIn['Field']
                     
-                    rowOut = {'A':0, 'B':0, 'value':0}
+                    rowOut = {FIELD_A_NAME:0, FIELD_B_NAME:0, FIELD_VALUE_NAME:0}
                     for field in rowIn:
                         value = rowIn[field]
-                        rowOut['A'] = colAName
-                        rowOut['B'] = field
-                        rowOut['value'] = value
+                        rowOut[FIELD_A_NAME] = colAName
+                        rowOut[FIELD_B_NAME] = field
+                        rowOut[FIELD_VALUE_NAME] = value
                         writer.writerow(rowOut)
                         countOfRowsWritten += 1
         print "wrote " + str(countOfRowsWritten) + " rows to " + self._output_file_name
