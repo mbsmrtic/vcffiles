@@ -1,12 +1,13 @@
 from talltable import TallTable
 from talltable import DEFAULT_DATA_DIR
 from talltable import DEFAULT_VCFS_DIR
-from os import remove
-from os import listdir
-from os.path import exists
 from vcffile import VcfFile
+from csv import DictWriter
 
 DEFAULT_OUTPUT_FILE_NAME = DEFAULT_DATA_DIR + 'tallsomeppl.csv'
+FIELD_PERSONID = 'personid'
+FIELD_SNPID = 'snpid'
+FIELD_ALLELE = 'allele'
 
 class TallSomePeople(TallTable):
     '''
@@ -21,14 +22,13 @@ class TallSomePeople(TallTable):
         Loops through the files that contain the data for the people identified in personIds.
         Creates a file similar to add_all except that not all the people are added.  
         '''
-        if exists(self.filename): 
-            remove(self.filename)
         
         #open the destination file and write the header line
         with open(self.filename, 'w') as destFile:
             print "created " + self.filename + "\n"
-            headerLine = "personid, snpid, allele"
-            destFile.write(headerLine + "\n")
+            headerFields = [FIELD_PERSONID, FIELD_SNPID, FIELD_ALLELE]
+            writer = DictWriter(destFile, headerFields, lineterminator='\n')
+            writer.writeheader()
 
             #loop through the files in the directory and add a column for each
             srcFileNames = []
@@ -39,7 +39,7 @@ class TallSomePeople(TallTable):
             
             fileCount = 0
             for srcFileName in srcFileNames:
-                self.write_one_person_to_file(self.inputDir + srcFileName, destFile)
+                self.write_one_person_to_file(self.inputDir + srcFileName, writer)
                 fileCount += 1
     
 if __name__ == '__main__':
