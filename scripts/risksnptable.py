@@ -1,12 +1,19 @@
 import os
 import vcffile
 import risksnps
+from csv import DictWriter
+from csv import DictReader
 
 DEFAULT_DATA_DIR = '../data/'
 DEFAULT_SNPTABLE_FILE_NAME = DEFAULT_DATA_DIR + 'risksnptable.csv'
 DEFAULT_OUTPUT_DIFFS_NAME = DEFAULT_DATA_DIR + 'risksnpdiffs.csv'
 DEFAULT_OUTPUT_DIFFS_TALL_NAME = DEFAULT_DATA_DIR + 'risksnpdiffstall.csv'
 DEFAULT_VCFS_DIR = DEFAULT_DATA_DIR + 'vcfdata/'
+FIELD_PERSONID = 'PersonId'
+FIELD_SNPIDA = 'snpIdA'
+FIELD_SNPIDB = 'snpIdB'
+FIELD_SNPID = 'snpId'
+FIELD_SAMEALLELECOUNT = 'sameAlleleCount'
 
 class RiskSnpTable():
     '''
@@ -20,7 +27,6 @@ class RiskSnpTable():
     directory adding a row at a time.
     
     '''
-    #todo Decide on a consistent naming convention for variables: camel caps or underscores?
 
     def __init__(self, inputDirectoryName = DEFAULT_VCFS_DIR, outputFileName=DEFAULT_SNPTABLE_FILE_NAME):
         self.filename = outputFileName
@@ -34,21 +40,24 @@ class RiskSnpTable():
         '''
 
         #open the destination file and write the header line
-        headerLine = self.get_file_header()
+        headerFields = self.get_file_header()
         with open(self.filename, 'w') as destFile:
             print "created " + self.filename + "\n"
-            destFile.write(headerLine + "\n")
+            writer = DictWriter(destFile, headerFields, lineterminator='\n')
+            writer.writeheader()
 
             #loop through the files in the directory and add a column for each
             srcFileNames = os.listdir(self.inputDir)
             fileCount = 0
             for srcFileName in srcFileNames:
-                lineOut = self.get_one_person_from_file(self.inputDir + srcFileName)
-                destFile.write(lineOut)
+                rowOut = self.get_one_person_from_file(self.inputDir + srcFileName)
+                writer.writerow(rowOut)
                 fileCount += 1
             if (fileCount == 1):
                 print ("You ran this on one snp file. For the entire dataset go to " +
                         "https://genomeinterpretation.org/content/crohns-disease-2012 \n")
+            else:
+                print ("Wrote " + str(fileCount) + " rows to " + self.filename)
 
     def get_one_person_from_file(self, srcFileName):
         '''
@@ -58,9 +67,14 @@ class RiskSnpTable():
         print srcFileName
         srcData = vcffile.VcfFile(srcFileName)
         personId = srcData.get_person_id()
+        rowOut = {FIELD_PERSONID:personId}
         riskAlleles = srcData.get_these_risksnps(self.riskSnps)
-        lineOut = personId + ',' + ','.join(riskAlleles) + '\n'
-        return lineOut
+        riskSnpIndex = 0
+        for allele in riskAlleles:
+            riskSnp = self.riskSnps.snps[riskSnpIndex]
+            rowOut[riskSnp] = allele
+            riskSnpIndex += 1
+        return rowOut
 
     def get_risk_snps(self):
         self.riskSnps.read_from_file()
@@ -71,14 +85,13 @@ class RiskSnpTable():
         labeling each column with the risk snp's snpId.
         '''
 
-        #get the risk snps and write out the header line
+        #get the risk snps and collect the header fields
         if (self.riskSnps.len() == 0):
             self.get_risk_snps()
-        headerLine = "PersonId"
+        headerFields = [FIELD_PERSONID]
         for snpId in self.riskSnps.snps:
-            headerLine += ", "
-            headerLine += snpId
-        return headerLine
+            headerFields.append(snpId)
+        return headerFields
 
     def add_normalization_data(self):
         '''
@@ -119,9 +132,11 @@ class RiskSnpCompare():
         self.riskSnps = risksnps.RiskSnps()
         self.inputFileName = inputFileName
 
-    def go(self):
+    def write_tall_and_wide_compares(self):
         '''
-        
+        RiskSnpTable contains one row per person and one column per risk snp. Here we 
+        loop through the table and compare each snp to each other snp.  The measure
+        we use to compare is the count of alleles that are the 
         '''
         
         sameCounts = self.getSameCounts()
@@ -130,66 +145,63 @@ class RiskSnpCompare():
         
     def writeDiffsTallTable(self, sameCounts):                
         #open the destination tall file and write the header line
-        headerLine = 'snpIdA,snpIdB,sameAlleleCount\n'
+        headerFields = [FIELD_SNPIDA, FIELD_SNPIDB, FIELD_SAMEALLELECOUNT]
         with open(self.diffsTallName, 'w') as destTallFile:
+            writer = DictWriter(destTallFile, headerFields, lineterminator='\n')
             print 'created ' + self.diffsTallName + '    '
-            destTallFile.write(headerLine)
+            writer.writeheader()
             #loop through the counts and write them out
             recordsWritten = 0
+            row = {}
             for key in sameCounts:
                 counts = sameCounts[key]
                 for k in counts:
                     count = sameCounts[key][k]
                     if (key.startswith('rs') and k.startswith('rs') and count > 0):
-                        lineOut = key + ',' + k + ',' + str(count) + '\n'
-                        destTallFile.write(lineOut)    
+                        row[FIELD_SNPIDA] = key
+                        row[FIELD_SNPIDB] = k
+                        row[FIELD_SAMEALLELECOUNT] = count
+                        writer.writerow(row)
                         recordsWritten += 1
             print 'wrote ' + str(recordsWritten) + ' records \n'
 
-        #write out the wide table
-        #    lineOut = 'snpId,' + ','.join(snpIds) + '\n'
     def writeDiffsWideTable(self, sameCounts):
         #collect all the column snps
-        columnSnps = []
+        headerFields = [FIELD_SNPID]
         for snpIdA in sameCounts:
             for snpIdB in sameCounts[snpIdA]:
-                if snpIdB not in columnSnps:
-                    columnSnps.append(snpIdB)
+                if snpIdB not in headerFields:
+                    headerFields.append(snpIdB)
 
-        #write out the header line with the column snps
-        headerLine = 'snpId'
-        for snpId in columnSnps:
-            headerLine += ',' + snpId
-        headerLine += '\n'
         with open(self.diffsFileName, 'w') as destFile:
             print 'create ' + self.diffsFileName + '    '
-            destFile.write(headerLine)
+            writer = DictWriter(destFile, headerFields, lineterminator='\n')
+            writer.writeheader()
             #loop through counts and write them out
             recordsWritten = 0
             for snpIdA in sameCounts:
-                lineOut = snpIdA
+                rowOut = {FIELD_SNPID:snpIdA}
                 snpIdBs = sameCounts[snpIdA]
                 for snpIdB in snpIdBs:
                     count = snpIdBs[snpIdB]
                     assert snpIdA.startswith('rs')
                     assert snpIdB.startswith('rs')
-                    lineOut += ',' + str(count)
-                lineOut += '\n'
-                destFile.write(lineOut)
+                    rowOut[snpIdB] = count
+                writer.writerow(rowOut)
                 recordsWritten += 1
         print 'wrote ' + str(recordsWritten) + ' records \n'
             
         
     def getSameCounts(self):
+        '''
+        Gets a two dimensional array of counts. The counts are the number of rows in 
+        which both snps have the risk allele. 
+        '''
         with open(self.inputFileName, 'r') as srcFile:
-            lineIn = srcFile.readline()
-            snpIds = lineIn.split(',')
-            #remove the first column label
-            snpIds = snpIds[1:]
-            
-            #strip whitespace from snpIds
-            for i in range(len(snpIds)):
-                snpIds[i] = snpIds[i].strip()
+            reader = DictReader(srcFile)
+            colHeaders = reader.fieldnames
+            #remove the first col header, the person Id column header to get the snpIds
+            snpIds = colHeaders[1:]
             
             #initialize our dictionary of same counts
             sameCounts = {}
@@ -198,27 +210,21 @@ class RiskSnpCompare():
                 for snpIdB in snpIds:
                     bDict[snpIdB] = 0
                 sameCounts[snpIdA] = bDict
-                
-            #loop through the file, counting
-            for lineIn in srcFile:
-                alleles = lineIn.split(',')
-                personId = alleles[0]
+
+            #loop through the rows incrementing our counts 
+            for row in reader:
+                #read and remove the personId so that we can loop over all the snps
+                personId = row[FIELD_PERSONID]
+                del(row[FIELD_PERSONID])
                 #don't count the normalization lines
                 if (len(personId) > 2):
-                    #remove the first element in the line, it's the personId
-                    alleles = alleles[1:]
-                    aIndex = 0
-                    for alleleA in alleles:
-                        bIndex = 0
-                        for alleleB in alleles:
-                            #we're defining 'same' as 'they both have the risk allele
+                    for snpIdA in row:
+                        alleleA = row[snpIdA]
+                        for snpIdB in row:
+                            alleleB = row[snpIdB]
                             if (alleleA == '4' and alleleB == '4'):
-                                snpA = snpIds[aIndex]
-                                snpB = snpIds[bIndex]
-                                sameCounts[snpA][snpB] = sameCounts[snpA][snpB] + 1
-                            bIndex += 1
-                        aIndex += 1
-            
+                                sameCounts[snpIdA][snpIdB] += 1
+
             return sameCounts
 
                 
@@ -227,7 +233,7 @@ if __name__ == '__main__':
     #destObj.add_all()
     #destObj.add_normalization_data()
     destObj = RiskSnpCompare()
-    destObj.go()
+    destObj.write_tall_and_wide_compares()
     
         
         
