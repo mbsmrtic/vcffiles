@@ -130,15 +130,16 @@ class TestRiskSnpTable(unittest.TestCase):
         table.riskSnps.set_snps(['rs7553640', 'rsnotinfile', 'rs2072928', 'rsalsonotthere', 'rs28640257'])
         table.riskSnps.set_alleles(['C', 'T', 'G', 'C', 'G'])
         personline = table.get_one_person_from_file(SAMPLEFILENAME)
-        print "personline: " + personline + "\n"
-        splitLine = personline[:-1].split(',')   #we remove the last character, the newline
-        self.assertEqual(6, len(splitLine))
-        self.assertEqual("A0024", splitLine[0])#person id
-        self.assertEqual('4', splitLine[1])    #rs7553640 risk allele C
-        self.assertEqual('0', splitLine[2]) #rsnotinfile
-        self.assertEqual('4', splitLine[3])    #rs2072928 risk allele G
-        self.assertEqual('0', splitLine[4]) #rsalsonotthere
-        self.assertEqual('4', splitLine[5])    #rs28640257 risk allele G
+        print "personline: " + str(personline) + "\n"
+        
+        self.assertEqual(6, len(personline))
+        self.assertEqual("A0024", personline[risksnptable.FIELD_PERSONID])#person id
+        self.assertEqual('4', personline['rs7553640'])    #rs7553640 risk allele C
+        self.assertEqual('0', personline['rsnotinfile']) #rsnotinfile
+        self.assertEqual('4', personline['rs2072928'])    #rs2072928 risk allele G
+        self.assertEqual('0', personline['rsalsonotthere']) #rsalsonotthere
+        self.assertEqual('4', personline['rs28640257'])    #rs28640257 risk allele G
+        
 
     def test_get_file_header(self):
         '''
@@ -146,9 +147,12 @@ class TestRiskSnpTable(unittest.TestCase):
         has one entry for each risk snp.
         '''
         table = risksnptable.RiskSnpTable()
-        headerLine = table.get_file_header()
-        print "headerLine: " + headerLine
-        self.assertTrue(headerLine.find("PersonId, rs1998598, rs2549794") == 0)
+        headerCols = table.get_file_header()
+        print "headerLine: " + str(headerCols)
+        self.assertEqual('PersonId', headerCols[0])
+        self.assertEqual('rs1998598', headerCols[1])
+        self.assertEqual('rs2549794', headerCols[2])
+        #self.assertTrue(headerLine.find("PersonId, rs1998598, rs2549794") == 0)
         
 def main():
     unittest.main()
