@@ -9,9 +9,9 @@ MAXSNPID ='zz'    #snpIDs begin with an 'rs' so they will always be less than th
 MINSNPID = 'aa'
 FIELD_PERSONID = 'personId'
 
-class SnpsInCommon():
+class DifferenceCounts():
     '''
-    SnpsInCommon creates a table that is a comparison of people. It contains one row per person
+    DifferenceCounts creates a table that is a comparison of people. It contains one row per person
     and one column per person and each cell is the count of snps that those two people have
     the same allele (A,C,G or T) for.  
     '''
@@ -102,7 +102,7 @@ class SnpsInCommon():
 
     
 if __name__ == '__main__':
-    destObj = SnpsInCommon()
+    destObj = DifferenceCounts()
     destObj.create_file()
     
         

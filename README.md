@@ -34,22 +34,19 @@ Input file formats
 			can be downloaded from the CAGI website above.  
 	* RiskSnps
 			I've included a table from the above paper that has a list of snps alleles with a significant 
-			association with Crohn's disease.  This file is included here in data/risksnps.csv
+			association with Crohn's disease.  This file is included here in data/oddsratio.csv
                                                 
 Current output file formats
 ---------------------------------
 
-	* TallTable
-			This class encapsulates a file format with at least these columns: personId, snpId, allele
-	* TallSomePpl
-			A tall table that can be filled with specific people. This is needed because when we include
-			all the people, the file is too large to pull into Tableau.
-	* SnpsInCommon
+	* DifferenceCounts
 			This class creates a difference matrix. Each row of the table is a person and each column is 
 			a person. Each cell contains the count of snps for which the two people have different alleles.
+	* TallTable
+			This class encapsulates a file format with at least these columns: personId, snpId, allele
 	* RiskSnpTallTable
 			This class encapsulates a file format with 3 columns: personId, snpId, and alleleNumber.
-			I use this table format to create a heatmap visualization where each dot is one of five
+			I use this table format to create a heatmap like visualization where each dot is one of five
 			colors depending on whether the allele is missing (the same as the reference genome),
 			A, C, G, or T. We want the highest contrast color to be the risk allele, so VcfFile converts 
 			the letters to numbers where 4 is the risk allele.  
