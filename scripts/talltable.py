@@ -81,43 +81,6 @@ class TallTable():
             recordCount += 1
         print srcFileName + ' wrote ' + str(recordCount) + ' records to ' + self.filename
 
-class SomeSnpsTallTable(TallTable):
-    '''
-    SomeSnpsTallTable is the same format as TallTable, but only includes some of the snps.
-    '''
-    
-    def __init__(self, snpsFileName = DEFAULT_SNPS_FILE,inputDirectoryName = DEFAULT_VCFS_DIR, outputFileName=DEFAULT_OUTPUT_FILE_NAME):
-        TallTable.__init__(self, inputDirectoryName, outputFileName)
-        self.snpsFileName = snpsFileName
-
-    def get_column_names(self):
-        colnames=[FIELD_INDEX, FIELD_PERSONID, FIELD_SNPID, FIELD_ALLELE]
-        return colnames
-        
-    def write_one_person_to_file(self, srcFileName, writer):
-        #get the snps
-        snpsToUse = self.get_snps_to_use()
-        srcData = vcffile.VcfFile(srcFileName)
-        personId = srcData.get_person_id()
-        alleles = srcData.get_these_snps(snpsToUse)
-        rowOut = {FIELD_INDEX:0, FIELD_PERSONID:personId, FIELD_SNPID:0, FIELD_ALLELE:0}
-        index = 0
-        snpsFoundThisPerson = 0
-        for allele in alleles:
-            if (allele != '0'):
-                rowOut[FIELD_INDEX] = self._recordCount
-                rowOut[FIELD_SNPID] = snpsToUse[index]
-                rowOut[FIELD_ALLELE] = allele
-                writer.writerow(rowOut)
-                self._recordCount += 1
-                snpsFoundThisPerson += 1
-            index += 1
-        print srcFileName + '  ' + str(snpsFoundThisPerson) + ' snps found'
-     
-    def get_snps_to_use(self):   
-        snpCounts = snpcounts.SnpCounts()
-        return snpCounts.read_snps()
-                    
         
 class RiskSnpTallTable(TallTable):
     '''
@@ -170,8 +133,6 @@ if __name__ == '__main__':
     #destObj.add_all()
     destObj = RiskSnpTallTable(outputFileName='../data/risksnptalltable.csv')
     destObj.add_all()
-    #destObj = SomeSnpsTallTable(outputFileName='../data/somesnpstall.csv')
-    #destObj.add_all()
     
     
         
